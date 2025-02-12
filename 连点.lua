@@ -31,7 +31,7 @@ function OnEvent(event, arg)
             OutputLogMessage("Rapid fire stopped\n")
         end
 
-        -- 如果连点模式开启
+        -- 连点
         if rapidFire then
           repeat
             Sleep(50)  
