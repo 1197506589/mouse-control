@@ -11,7 +11,7 @@ EnablePrimaryMouseButtonEvents(true)
 
 -- 主循环
 function OnEvent(event, arg)
-    -- 检测鼠标5键按下
+    -- 检测鼠标6键按下
     if event == "MOUSE_BUTTON_PRESSED" and arg == mouseButton5 then
         toggle = not toggle  -- 切换模式
         OutputLogMessage("Toggle mode: %s\n", toggle and "ON" or "OFF")
