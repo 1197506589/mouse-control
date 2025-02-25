@@ -2,7 +2,7 @@ local toggle = false
 local rapidFire = false
 
 -- 定义鼠标按键常量
-local mouseButton5 = 6
+local mouseButton6 = 6
 local mouseLeft = 1
 local mouseRight = 3
 
@@ -12,7 +12,7 @@ EnablePrimaryMouseButtonEvents(true)
 -- 主循环
 function OnEvent(event, arg)
     -- 检测鼠标6键按下
-    if event == "MOUSE_BUTTON_PRESSED" and arg == mouseButton5 then
+    if event == "MOUSE_BUTTON_PRESSED" and arg == mouseButton6 then
         toggle = not toggle  -- 切换模式
         OutputLogMessage("Toggle mode: %s\n", toggle and "ON" or "OFF")
     end
