@@ -106,7 +106,7 @@ end
 -- 主函数
 function OnEvent(event, arg)
 
-    -- 检测大写键锁定 打开火力模式
+    -- 检测num键锁定 打开火力模式
     if  IsKeyLockOn("numlock" ) then 
         if not Firemod then
             Firemod = true
@@ -114,7 +114,7 @@ function OnEvent(event, arg)
         end
     end
 
-     -- 大写键解锁 关闭火力模式
+     -- num键解锁 关闭火力模式
     if  not IsKeyLockOn("numlock" ) then 
         if Firemod then
             Firemod = false
