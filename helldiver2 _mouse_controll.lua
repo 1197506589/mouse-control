@@ -67,12 +67,12 @@ local skills = {
 local top = 100
 local G6 = 101
 
-local on1 = 20
-local on2 = 21
-local lf1 = 24
+local on1 = 2
+local on2 = 28
+local lf1 = 20
 local lf2 = 44
-
-local WPFiremod = 0
+--1-净化者  2-爆裂铳  3-全自动左键
+local WPFiremod = 3
 --define--
 local Firemod = false
 local mod = 0
@@ -102,6 +102,7 @@ function executeSkill(skillId)
     end
 end
 
+
 -- 主函数
 function OnEvent(event, arg)
 
@@ -121,51 +122,49 @@ function OnEvent(event, arg)
         end
     end
 
-    if event == "MOUSE_BUTTON_PRESSED" and arg == 1  then
-        running = true
-    end
-
-    if event == "MOUSE_BUTTON_RELEASED" and arg == 1 then
-        running = false
-    end
-    
     -- 如果模式1开启（净化者）
-    if WPFiremod == 1 then
-        if  Firemod then
-            if event == "MOUSE_BUTTON_PRESSED" and arg == 1 then
-                if not running then  -- 防止重复触发
-                    running = true
-                    OutputLogMessage("Loop started\n")
-                    while running do
-                        OutputLogMessage("Pressed MB1\n")
-                        -- 分割 1050ms 为小块，检查状态
-                        for i = 1, 105 do
-                            Sleep(10)
-                            if not IsMouseButtonPressed(1) then 
-                                running = false 
-                                ReleaseMouseButton(1)
-                                break 
-                            end
-                        end
-                        if running then            -- 仅在仍运行时松开
-                            ReleaseMouseButton(1)
-                            OutputLogMessage("Released MB1\n")
-                            Sleep(50)
-                            PressMouseButton(1)
-                        end
-                   end
-                   OutputLogMessage("Loop ended\n")
-               end
-           elseif event == "MOUSE_BUTTON_RELEASED" and arg == 1 then
-               running = false
-           end
+    if WPFiremod == 1 and Firemod then
+        if event == "MOUSE_BUTTON_PRESSED" and arg == 1 then
+            if not running then
+                running = true
+                OutputLogMessage("Loop started\n")
+                SetMKeyState(1) -- 触发循环
+            end
+        elseif event == "MOUSE_BUTTON_RELEASED" and arg == 1 then
+            running = false
         end
-    end       
+
+        if event == "M_PRESSED" and running then
+            OutputLogMessage("Pressed MB1\n")
+
+            -- 按住 1050ms，分割成 105 次循环，每次 10ms
+            for i = 1, 105 do
+                Sleep(10)
+                if not IsMouseButtonPressed(1) then
+                    running = false
+                    ReleaseMouseButton(1)
+				  OutputLogMessage("Released MB1\n")
+                    break
+                end
+            end
+
+            if running then
+                ReleaseMouseButton(1)
+                OutputLogMessage("Released MB1\n")
+                Sleep(50)
+                PressMouseButton(1)
+                SetMKeyState(1) -- 继续循环
+            else
+                OutputLogMessage("Loop ended\n")
+            end
+        end
+    end
     -- 如果模式2开启（爆裂铳）
     if WPFiremod == 2 then
         if  Firemod then
             if IsMouseButtonPressed(1) then
                 repeat
+                    PressMouseButton(1)
                     Sleep(50)
                     Firemod = true
                     PressKey("2")
@@ -185,10 +184,21 @@ function OnEvent(event, arg)
             end
         end
     end
-    
+
+    -- 如果模式3开启（全自动左键）
     if WPFiremod == 3 then
         if Firemod then
-
+            if event == "MOUSE_BUTTON_PRESSED" and arg == 1 then
+                leftClicking = true
+                SetMKeyState(1)  -- 触发事件循环
+            elseif event == "MOUSE_BUTTON_RELEASED" and arg == 1 then
+                leftClicking = false
+            end
+        
+            if event == "M_PRESSED" and leftClicking then
+                PressAndReleaseMouseButton(1)  -- 触发左键点击
+                SetMKeyState(1)  -- 继续触发 M_PRESSED 事件，保持循环
+            end
         end
     end
 
