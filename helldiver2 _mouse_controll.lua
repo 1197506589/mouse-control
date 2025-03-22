@@ -1,3 +1,15 @@
+--setting--
+local top = 100
+local G6 = 101
+
+local on1 = 20
+local on2 = 28
+local lf1 = 54 
+local lf2 = 65
+--1-净化者  2-爆裂铳  3-全自动左键
+local WPFiremod = 2
+
+
 local skills = {
     [100] = {"增援", {"up", "down", "right", "left", "up"}},
     [101] = {"重新补给", {"down", "down", "up", "right"}},
@@ -49,12 +61,14 @@ local skills = {
     [51] = {"榴弹发射器", {"down", "left", "up", "left", "down"}},
     [52] = {"喷火器", {"down", "left", "up", "down", "up"}},
     [53] = {"灭菌器", {"down", "left", "up", "down", "left"}},
+    [54] = {"机枪", {"down", "left", "down", "up", "right"}},
 
     [60] = {"机枪狗", {"down", "up", "left", "up", "right", "down"}},
     [61] = {"毒气狗", {"down", "up", "left", "up", "right", "up"}},
     [62] = {"蛋盾", {"down", "up", "left", "right", "left", "right"}},
     [63] = {"补给背包", {"down", "left", "down", "up", "up", "down"}},
     [64] = {"便携式地狱火", {"down", "right", "up", "up", "up"}},
+    [65] = {"悬浮背包", {"down", "up", "up", "down", "left", "right"}},
 
     [70] = {"侦察车", {"left", "down", "right", "down", "right", "down", "up"}},
     [71] = {"爱国者机甲", {"left", "down", "right", "up", "left", "down", "down"}},
@@ -63,20 +77,12 @@ local skills = {
 
 }
 
---setting--
-local top = 100
-local G6 = 101
 
-local on1 = 2
-local on2 = 28
-local lf1 = 20
-local lf2 = 44
---1-净化者  2-爆裂铳  3-全自动左键
-local WPFiremod = 3
 --define--
 local Firemod = false
 local mod = 0
 local running = false
+local leftClicking = false
 EnablePrimaryMouseButtonEvents(true)
 
 
@@ -88,15 +94,15 @@ function executeSkill(skillId)
         local sequence = skill[2]
         OutputLogMessage("run: " .. skillId .. "\n")
         PressKey("lctrl")
-        Sleep(40)
+        Sleep(50)
         for _, key in ipairs(sequence) do
             PressKey(key)
-            Sleep(40)
+            Sleep(50)
             ReleaseKey(key)
-            Sleep(40)
+            Sleep(50)
         end
         ReleaseKey("lctrl")
-        Sleep(40)
+        Sleep(50)
     else
         OutputLogMessage("error: " .. skillId .. "\n")
     end
@@ -119,6 +125,47 @@ function OnEvent(event, arg)
         if Firemod then
             Firemod = false
             OutputLogMessage("Firemod mode: off\n")
+        end
+    end
+
+
+    -- 悬浮背包左脚踩右脚
+    if event == "MOUSE_BUTTON_PRESSED" and arg == 3 then
+        PressKey("w")
+        Sleep(20)
+        PressKey("lshift")
+        Sleep(20)
+        PressKey("b")
+        Sleep(80)
+        ReleaseKey("b")
+        Sleep(350)
+        PressKey("spacebar")
+        Sleep(600)
+        ReleaseKey("spacebar")
+        Sleep(50)
+        ReleaseKey("lshift")
+        Sleep(20)
+        ReleaseKey("w")
+        Sleep(800)
+        PressKey("x")
+        Sleep(100)
+        for i = 0, 25 do
+            MoveMouseRelative(-12, -8)
+            Sleep(8)
+        end
+        Sleep(100)
+        ReleaseKey("x")
+        for i = 0, 250 do
+            PressKey("e")
+            Sleep(2)
+            ReleaseKey("e")
+            Sleep(2)
+        end
+        for i = 0, 30 do
+            PressKey("b")
+            Sleep(10)
+            ReleaseKey("b")
+		   Sleep(10)	
         end
     end
 
@@ -186,21 +233,30 @@ function OnEvent(event, arg)
     end
 
     -- 如果模式3开启（全自动左键）
-    if WPFiremod == 3 then
-        if Firemod then
-            if event == "MOUSE_BUTTON_PRESSED" and arg == 1 then
+
+    if WPFiremod == 3 and Firemod then
+        if event == "MOUSE_BUTTON_PRESSED" and arg == 1 then
+            if not leftClicking then
                 leftClicking = true
                 SetMKeyState(1)  -- 触发事件循环
-            elseif event == "MOUSE_BUTTON_RELEASED" and arg == 1 then
-                leftClicking = false
             end
-        
-            if event == "M_PRESSED" and leftClicking then
-                PressAndReleaseMouseButton(1)  -- 触发左键点击
-                SetMKeyState(1)  -- 继续触发 M_PRESSED 事件，保持循环
+        elseif event == "MOUSE_BUTTON_RELEASED" and arg == 1 then
+            leftClicking = false
+        end
+
+        if event == "M_PRESSED" and leftClicking then
+            PressMouseButton(1)  
+            Sleep(10)  -- 按住 10ms
+            ReleaseMouseButton(1)
+            Sleep(10)  -- 松开 10ms
+
+            -- 继续循环
+            if leftClicking then
+                SetMKeyState(1)
             end
         end
     end
+
 
 
 
